@@ -1,0 +1,17 @@
+{
+  "type": "module",
+  "dependencies": {
+    "axios": "^1.8.4",
+    "inquirer": "^8.2.4"
+  },
+  "name": "nodejs_midterm",
+  "version": "1.0.0",
+  "description": "Command Line Interface (CLI) application (cli.js) that interacts with openlibrary API and a file system-based database.",
+  "main": "cli.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "node cli.js --help"
+  },
+  "author": "Javier Gonzalez, Michael Salter, Andy Liang, Kevin Padilla, Elijah De Vera, Noelani Mishina Hinh",
+  "license": "ISC"
+}
