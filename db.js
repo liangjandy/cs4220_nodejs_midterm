@@ -110,3 +110,29 @@ export const saveUnique = async (collection, data) => {
     }
 };
 
+/**
+ * Deletes a single record from a collection by matching a key-value pair.
+ * @param {string} collection - The name of the collection file.
+ * @param {Object} query - An object with a single key-value pair to match.
+ * @returns {Promise<void>}
+ */
+export const deleteOne = async (collection, query) => {
+    try {
+        let records = await _read(collection);
+        const [key, value] = Object.entries(query)[0];
+
+        const filteredRecords = records.filter(record => record[key] !== value);
+
+        if (filteredRecords.length === records.length) {
+            console.log(`⚠️ No record found for deletion in ${collection}.`);
+            return;
+        }
+
+        const fullPath = path.resolve(dbDirectory, `${collection}.json`);
+        await fs.promises.writeFile(fullPath, JSON.stringify(filteredRecords, null, 2));
+
+        console.log(`✅ Successfully deleted ${key}: ${value}`);
+    } catch (error) {
+        throw new Error(`Error deleting record in ${collection}: ${error.message}`);
+    }
+};

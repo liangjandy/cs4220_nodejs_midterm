@@ -103,12 +103,14 @@ const displayItemDetails = async (item) => {
             type: 'list',
             name: 'action',
             message: 'What would you like to do?',
-            choices: ['🔖 Bookmark', ]
+            choices: ['🔖 Bookmark', 'Exit' ]
         }
     ]);
 
     if (action === '🔖 Bookmark') {
         await saveBookmark(item);
+    } else {
+        console.log('Returning to main menu.');
     }
 };
 
@@ -121,5 +123,54 @@ export const saveBookmark = async (item) => {
         console.log(`✅ Bookmarked: ${item.title}`);
     } else {
         console.log(`🔖 Already bookmarked.`);
+    }
+};
+
+// Function to view and manage bookmarks with delete confirmation
+export const viewBookmarks = async () => {
+    try {
+        let bookmarks = await db.find(bookmarkFile) || [];
+
+        if (bookmarks.length === 0) {
+            console.log('📂 No bookmarks saved.');
+            return;
+        }
+
+        const { selectedBookmark } = await inquirer.prompt([
+            {
+                type: 'list',
+                name: 'selectedBookmark',
+                message: 'Select a bookmark to manage:',
+                choices: [...bookmarks.map(b => b.title), new inquirer.Separator(), '❌ Cancel']
+            }
+        ]);
+
+        if (selectedBookmark === '❌ Cancel') {
+            console.log('Operation canceled.');
+            return;
+        }
+
+        // Ask for confirmation before deleting
+        const { confirmDelete } = await inquirer.prompt([
+            {
+                type: 'confirm',
+                name: 'confirmDelete',
+                message: `Are you sure you want to delete "${selectedBookmark}"?`,
+                default: false
+            }
+        ]);
+
+        if (!confirmDelete) {
+            console.log('❌ Deletion canceled.');
+            return;
+        }
+
+        // Proceed with deletion
+        await db.deleteOne(bookmarkFile, { title: selectedBookmark });
+
+        console.log(`🗑️ Successfully deleted bookmark: ${selectedBookmark}`);
+
+    } catch (error) {
+        console.error('❌ Error loading bookmarks:', error.message);
     }
 };
